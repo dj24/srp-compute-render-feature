@@ -45,11 +45,11 @@ public class ExampleRendererFeature : ScriptableRendererFeature
             // Get temporary copy of the scene texture
             var tempColorTarget = RenderTexture.GetTemporary(camera.cameraTargetDescriptor);
             tempColorTarget.enableRandomWrite = true;
-            cmd.Blit(colorTarget,tempColorTarget);
+            cmd.Blit(colorTarget.rt,tempColorTarget);
             
             // Setup compute params
             cmd.SetComputeTextureParam(_exampleComputeShader, KernelIndex, "Scene", tempColorTarget);
-            cmd.SetComputeTextureParam(_exampleComputeShader, KernelIndex, "Depth", depthTarget);
+            cmd.SetComputeTextureParam(_exampleComputeShader, KernelIndex, "Depth", depthTarget.rt);
             cmd.SetComputeVectorParam(_exampleComputeShader, "SkyColor", _skyColor);
             cmd.SetComputeFloatParam(_exampleComputeShader, "FogDistance", _fogDistance);
             
@@ -65,9 +65,9 @@ public class ExampleRendererFeature : ScriptableRendererFeature
             // Copy temporary texture into colour buffer
             cmd.Blit(tempColorTarget, colorTarget);
             context.ExecuteCommandBuffer(cmd);
-            cmd.Clear();
             
             // Clean up
+            cmd.Clear();
             RenderTexture.ReleaseTemporary(tempColorTarget);
             CommandBufferPool.Release(cmd);
         }
