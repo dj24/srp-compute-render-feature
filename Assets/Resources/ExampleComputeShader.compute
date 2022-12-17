@@ -1,0 +1,13 @@
+#pragma kernel Main
+
+Texture2D<float> Depth;
+RWTexture2D<float4> Scene;
+float4 SkyColor;
+float FogDistance;
+
+[numthreads(8,8,1)]
+void Main(uint2 id : SV_DispatchThreadID)
+{
+    const float depthFactor = clamp(1 - Depth[id] * FogDistance, 0,1);
+    Scene[id] = lerp(Scene[id], SkyColor, depthFactor);
+}
